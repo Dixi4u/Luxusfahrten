@@ -1,9 +1,9 @@
 import {Schema, model} from "mongoose";
 
 const modelsSchema = new Schema({
-    idBranch: {
+    idBrand: {
         type: Schema.Types.ObjectId,
-        ref: "branches",
+        ref: "brand",
         require: true
     },
     nameModel: {
@@ -16,4 +16,4 @@ const modelsSchema = new Schema({
     strict: false
 })
 
-export default model("models", modelsSchema)
+export default model("model", modelsSchema)

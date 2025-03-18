@@ -7,9 +7,8 @@ const app = express();
 app.use(express.json());
 
 
-app.use("/api/models", modelsRoutes);
-app.use("api/brand", brandRoutes);
-
+app.use("/api/model", modelsRoutes);
+app.use("/api/brand", brandRoutes);
 
 
 export default app;
