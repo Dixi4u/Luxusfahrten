@@ -3,7 +3,7 @@ import vehiclesModel from "../models/Vehicles.js"
 
 //SELECT
 vehiclesController.getVehicle = async (req, res) => {
-   const evaluation = await vehiclesModel.find().populate('idBrand')
+   const evaluation = await vehiclesModel.find().populate('idBrand').populate('idModel')
    res.json(evaluation)
 }
 
