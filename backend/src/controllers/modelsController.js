@@ -3,7 +3,7 @@ import modelsModel from "../models/Models.js"
 
 //SELECT
 modelsController.getModel = async (req, res) => {
-   const evaluation = await modelsModel.find().populate('idBranches')
+   const evaluation = await modelsModel.find().populate('idBrand')
    res.json(evaluation)
 }
 
