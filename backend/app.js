@@ -2,6 +2,7 @@ import express from "express";
 import modelsRoutes from "./src/routes/models.js"
 import brandRoutes from "./src/routes/brand.js"
 import ordersRoutes from "./src/routes/orders.js"
+import vehicleRoutes from "./src/routes/vehicles.js"
 import restoredVehicleRoutes from "./src/routes/restoreVehicles.js"
 
 const app = express();

@@ -3,7 +3,7 @@ import RestoredVehicleModel from "../models/Restorevehicles.js"
 
 //SELECT
 RestoredVehicleController.getRestoredVehicle = async (req, res) => {
-   const evaluation = await RestoredVehicleModel.find().populate('idBrand')
+   const evaluation = await RestoredVehicleModel.find().populate('idBrand').populate('idModel')
    res.json(evaluation)
 }
 
