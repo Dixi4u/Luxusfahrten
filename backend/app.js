@@ -12,7 +12,19 @@ app.use(express.json());
 
 
 app.use("/api/models", modelsRoutes);
+
 app.use("api/brand", brandRoutes);
+
+app.use("/api/sales", salesRoutes);
+
+app.use("/api/provider", providerRoutes);
+
+app.use("/api/orders", ordersRoutes);
+
+app.use("/api/vehicles", vehicleRoutes);
+
+app.use("/api/restoredvehicles", restoredVehicleRoutes);
+
 
 
 
