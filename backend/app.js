@@ -6,6 +6,9 @@ import providerRoutes from "./src/routes/provider.js"
 import ordersRoutes from "./src/routes/orders.js"
 import vehicleRoutes from "./src/routes/vehicles.js"
 import restoredVehicleRoutes from "./src/routes/restoreVehicles.js"
+import loginRoutes from "./src/routes/login.js"
+import registerRoutes from "./src/routes/register.js"
+import logoutRoute from "./src/routes/logout.js";
 
 const app = express();
 app.use(express.json());
@@ -25,6 +28,11 @@ app.use("/api/vehicles", vehicleRoutes);
 
 app.use("/api/restoredvehicles", restoredVehicleRoutes);
 
+app.use("api/register", registerRoutes)
+
+app.use("/api/login", loginRoutes)
+
+app.use("/api/logout", logoutRoute)
 
 
 

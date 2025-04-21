@@ -1,4 +1,4 @@
-import {Schema, models} from 'mongoose';
+import {Schema, model} from 'mongoose';
 
 const providerSchema = new Schema({
     nameProvider: {
@@ -26,4 +26,4 @@ const providerSchema = new Schema({
     strict: false
 });
 
-export default models('provider', providerSchema);
+export default model('provider', providerSchema);

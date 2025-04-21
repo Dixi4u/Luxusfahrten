@@ -1,6 +1,6 @@
 const providerControllers = {};
 
-import providerModels from "./models/Provider.js";
+import providerModels from "../models/Provider.js";
 
 //Select
 
