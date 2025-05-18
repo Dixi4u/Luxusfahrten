@@ -38,6 +38,10 @@ const vehiclesSchema = new Schema({
     availability: {
         type: String,
         require: true
+    },
+    image: {
+        type: String,
+        require: true
     }
     
 }, {

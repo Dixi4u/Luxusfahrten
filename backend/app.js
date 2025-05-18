@@ -7,28 +7,31 @@ import ordersRoutes from "./src/routes/orders.js"
 import vehicleRoutes from "./src/routes/vehicles.js"
 import restoredVehicleRoutes from "./src/routes/restoreVehicles.js"
 import loginRoutes from "./src/routes/login.js"
-import registerRoutes from "./src/routes/register.js"
+import registerModeratorRoutes from "./src/routes/register.js"
 import logoutRoute from "./src/routes/logout.js";
+import registerUserRoutes from "./src/routes/registerUser.js";
 
 const app = express();
 app.use(express.json());
 
 
-app.use("/api/models", modelsRoutes);
+app.use("/api/models", modelsRoutes)
 
-app.use("api/brand", brandRoutes);
+app.use("api/brand", brandRoutes)
 
-app.use("/api/sales", salesRoutes);
+app.use("/api/sales", salesRoutes)
 
-app.use("/api/provider", providerRoutes);
+app.use("/api/provider", providerRoutes)
 
-app.use("/api/orders", ordersRoutes);
+app.use("/api/orders", ordersRoutes)
 
-app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/vehicles", vehicleRoutes)
 
-app.use("/api/restoredvehicles", restoredVehicleRoutes);
+app.use("/api/restoredvehicles", restoredVehicleRoutes)
 
-app.use("api/register", registerRoutes)
+app.use("/api/register", registerModeratorRoutes)
+
+app.use("/api/register", registerUserRoutes)
 
 app.use("/api/login", loginRoutes)
 

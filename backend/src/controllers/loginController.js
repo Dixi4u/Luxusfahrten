@@ -1,27 +1,61 @@
 import userModel from '../models/User.js'
+import providerModel from '../models/Provider.js'
+import moderatorModel from '../models/Moderator.js'
 import bcryptjs from 'bcryptjs'
-import jsonwebtoken from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import {config} from '../config.js'
 
-const loginControl = {}
+const loginController = {}
 
-loginControl.Login = async (req, res) => {
-    const { email, password } = req.body
-    try{
+loginController.login = async (req, res) => {
+    const {email, password} = req.body
+    try {
         let userFound
         let userType
-        if(email === config.emailAdmin.email && password === config.emailAdmin.password) {userType = 'admin', userFound = {_id: 'admin'}}
-
-        else{userFound = await userModel.findOne({email}), userType = 'provider'}
-
-        if(!userFound){userFound = await userModel.findOne({email}), userType = 'user' }
-
-        if(!userFound){console.log("No se ha podido encontrar al usuario"); return res.status(400).json({message: "No se ha podido encontrar al usuario"}) }
-
-        if(userType !== 'admin') { const isMatch = await bcryptjs.compare(password, userFound.password); if(!isMatch){ console.log("Contraseña incorrecta"); return res.status(400).json({message: "Contraseña incorrecta"})  } }
-
-        jsonwebtoken.sign({user: userFound._id, userType}, config.JWT.secret, {expiresIn: config.JWT.expiresIn}, (error, token) => {if(error) return res.status(500).json({message: "Error en el login"}), res.cookie("authToken", token), res.json({message: "Inicio de sesion exitoso"}) })
-    } catch(error){ return res.status(400).json({message: "El email o la contraseña son incorrectos"}) }
+        if(email === config.emailAdmin.email && password === config.emailAdmin.password){
+            userType = 'admin'
+            userFound = {_id: 'admin'}
+        }
+        else{
+            userFound = await moderatorModel.findOne({email})
+            userType = 'Moderator'
+        }
+        if(!userFound){
+            userFound = await providerModel.findOne({email})
+            userType = 'Provider'
+        }
+        else{
+            userFound = await userModel.findOne({email})
+            userType = 'User'
+        }
+        if(!userFound){
+            console.log('User not found')
+            return res.status(404).json({message: 'User not found'})
+        }
+        if(userType !== 'admin'){
+            /*const isMatch = password === userFound.password;*/
+            const isMatch = await bcryptjs.compare(password, userFound.password) 
+            if(!isMatch){
+                console.log('Invalid credentials')
+                return res.status(401).json({message: 'Invalid credentials'})
+            }
+        }
+        jwt.sign(
+            {user: userFound._id, userType},
+            config.JWT.secret,
+            {expiresIn: config.JWT.expiresIn},
+            (error, token) => {
+                if(error){
+                    console.log('Error signing token', error)
+                    return res.status(500).json({message: 'Error signing token'})
+                }
+                res.cookie('authToken', token)
+                res.status(200).json({message: 'Login successful',})
+            }
+        )
+    }
+    catch (error) {
+        console.error('Error logging in', error)
+        res.status(500).json({message: 'Error logging in'})
+        }
 }
-
-export default loginControl

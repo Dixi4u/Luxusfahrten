@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const providerSchema = new Schema({
+const moderatorSchema = new Schema({
     name: { 
         type: String, 
         required: true 
@@ -35,14 +35,8 @@ const providerSchema = new Schema({
         type: Boolean, 
         default: true 
     },
-    addressProvider: { 
-        type: String 
-    },
-    typeSupplier: { 
-        type: String 
-    }
 }, {
     timestamps: true
 });
 
-export default model("provider", providerSchema);
+export default model("moderators", moderatorSchema);

@@ -46,6 +46,10 @@ const restoredVehiclesSchema = new Schema({
     restorationCost: {
         type: Number,
         require: true
+    },
+    image: {
+        type: String,
+        require: true
     }
     
 }, {

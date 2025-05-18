@@ -12,8 +12,8 @@ providerControllers.getProviders = async (req, res) => {
 //INSERT
 
 providerControllers.insertProvider = async (req, res) => {
-    const { nameProvider, addressProvider, phone, email, typeSupplier } = req.body;
-    const newProvider = new providerModels({ nameProvider, addressProvider, phone, email, typeSupplier});
+    const { name, lastName, birthday, email, password, telephone, dui, isVerified, addressProvider, typeSupplier } = req.body;
+    const newProvider = new providerModels({ name, lastName, birthday, email, password, telephone, dui, isVerified, addressProvider, typeSupplier });
     await newProvider.save();
     res.json({ message: "Provider inserted" });
 };
@@ -21,8 +21,8 @@ providerControllers.insertProvider = async (req, res) => {
 //UPDATE
 
 providerControllers.updateProvider = async (req, res) => {
-    const { nameProvider, addressProvider, phone, email, typeSupplier } = req.body;
-    const updatedProvider = await providerModels.findByIdAndUpdate(req.params.id, { nameProvider, addressProvider, phone, email, typeSupplier }, { new: true });
+    const { name, lastName, birthday, email, password, telephone, dui, isVerified, addressProvider, typeSupplier } = req.body;
+    const updatedProvider = await providerModels.findByIdAndUpdate(req.params.id, { name, lastName, birthday, email, password, telephone, dui, isVerified, addressProvider, typeSupplier }, { new: true });
     res.json({ message: "Provider updated" });
 };
 
