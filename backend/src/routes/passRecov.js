@@ -1,5 +1,6 @@
 import express from 'express'
-import passRecov from '../controllers/passRecovControl'
+import passRecov from '../controllers/passRecovControl.js'
+
 
 const router = express.Router()
 

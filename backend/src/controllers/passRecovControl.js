@@ -5,7 +5,7 @@ import userModel from '../models/User.js'
 import providerModel from '../models/Provider.js'
 import moderatorModel from '../models/Moderator.js'
 import { config } from '../config.js'
-import { sendEmail, HTMLRecoveryEmail } from '../utils/emailPassRecov.js'
+import { sendMail, HTMLRecoveryEmail } from '../utils/emailPassRecov.js'
 
 const passRecov = {}
 passRecov.requestCode = async (req, res) => {

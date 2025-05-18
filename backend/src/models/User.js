@@ -34,6 +34,9 @@ const userSchema = new Schema({
     isVerified: { 
         type: Boolean, 
         default: true 
+    },
+    image: { 
+        type: String 
     }
 }, {
     timestamps: true

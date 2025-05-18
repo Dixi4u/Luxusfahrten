@@ -4,20 +4,31 @@ import userModel from '../models/User.js'
 import crypto from 'crypto'
 import providerModel from '../models/Provider.js'
 import { config } from '../config.js'
+import { v2 as cloudinary } from 'cloudinary'
 import sendVerificationEmail from '../utils/verificationCode.js'
+
+cloudinary.config({
+    cloud_name: config.cloudinary.cloudinary_name,
+    api_key: config.cloudinary.cloudinary_api_key,
+    api_secret: config.cloudinary.cloudinary_api_secret
+})
 
 const register = {}
 
 register.registerUser = async (req, res) => {
     const { name, lastName, birthday, email, password, telephone, dui, isVerified } = req.body
+    let imgUrl = ""
     try {
         const existingUser = await userModel.findOne({ email })
         if (existingUser) {
             return res.status(400).json({ message: 'Email already exists' })
         }
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, { folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg'] })
+            imgUrl = result.secure_url
+        }
         const passwordHash = await bcryptjs.hash(password, 10)
-        const newUser = new userModel({name,lastName,birthday,email,password: passwordHash,telephone,dui,isVerified
-        })
+        const newUser = new userModel({name,lastName,birthday,email,password: passwordHash,telephone,dui,isVerified,image: imgUrl})
         await newUser.save()
 
         const verificationCode = crypto.randomBytes(2).toString('hex')
@@ -40,13 +51,17 @@ register.registerUser = async (req, res) => {
 register.registerProvider = async (req, res) => {
     const { 
         name, lastName, birthday, email, password, telephone, dui, 
-        isVerified, addressProvider, typeSupplier 
-    } = req.body
+        isVerified, addressProvider, typeSupplier } = req.body
+    let imgUrl = ""
 
     try {
         const existingProvider = await providerModel.findOne({ email })
         if (existingProvider) {
             return res.status(400).json({ message: 'Email already exists' })
+        }
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, { folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg'] })
+            imgUrl = result.secure_url
         }
 
         const passwordHash = await bcryptjs.hash(password, 10)
@@ -61,7 +76,8 @@ register.registerProvider = async (req, res) => {
             dui,
             isVerified,
             addressProvider,
-            typeSupplier
+            typeSupplier,
+            image: imgUrl
         })
 
         await newProvider.save()
@@ -84,6 +100,8 @@ register.registerProvider = async (req, res) => {
         return res.status(500).json({ message: 'Error registering provider', error })
     }
 }
+
+
 register.verificationCode = async (req, res) => {   
     const { code } = req.body
     const token = req.cookies.verificationCode

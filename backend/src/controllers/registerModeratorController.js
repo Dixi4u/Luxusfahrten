@@ -1,19 +1,31 @@
 import moderatorModel from '../models/Moderator.js'
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { v2 as cloudinary } from 'cloudinary'
 import { config } from '../config.js'
 
 const register = {}
 
+cloudinary.config({
+    cloud_name: config.cloudinary.cloudinary_name,
+    api_key: config.cloudinary.cloudinary_api_key,
+    api_secret: config.cloudinary.cloudinary_api_secret
+})
+
 register.registerModerator = async (req, res) => {
     const { name, lastName, birthday, email, password, telephone, dui, isVerified } = req.body
+    let imgUrl = ""
     try {
         const existingModerator = await moderatorModel.findOne({email})
         if (existingModerator) {
             return res.status(400).json({ message: 'The email is already in use' })
         }
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, { folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg'] })
+            imgUrl = result.secure_url
+        }
         const passwordHash = await bcryptjs.hash(password, 10)
-        const newModerator = new moderatorModel({ name, lastName, birthday, email, password: passwordHash, telephone, dui, isVerified: true })
+        const newModerator = new moderatorModel({ name, lastName, birthday, email, password: passwordHash, telephone, dui, isVerified: true, image: imgUrl })
         await newModerator.save()
 
         jwt.sign(

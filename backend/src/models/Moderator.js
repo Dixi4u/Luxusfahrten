@@ -35,6 +35,9 @@ const moderatorSchema = new Schema({
         type: Boolean, 
         default: true 
     },
+    image: { 
+        type: String 
+    }
 }, {
     timestamps: true
 });

@@ -40,6 +40,9 @@ const providerSchema = new Schema({
     },
     typeSupplier: { 
         type: String 
+    },
+    image: { 
+        type: String 
     }
 }, {
     timestamps: true
