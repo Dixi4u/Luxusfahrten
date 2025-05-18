@@ -22,25 +22,25 @@ app.use(cookieParser())
 app.use(cors({
     origin: true,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
-app.get("/api/status", (req, res) => {
-    res.status(200).json({ message: "Servidor de Luxusfahrten en línea ✅" })
+app.get('/api/status', (req, res) => {
+    res.status(200).json({ message: 'Servidor de Luxusfahrten en línea ✅' })
 })
 
-app.use("/api/models", modelsRoutes)
-app.use("/api/brand", brandRoutes)
-app.use("/api/sales", salesRoutes)
-app.use("/api/provider", providerRoutes)
-app.use("/api/orders", ordersRoutes)
-app.use("/api/vehicles", vehicleRoutes)
-app.use("/api/restoredvehicles", restoredVehicleRoutes)
-app.use("/api/register/moderator", registerModeratorRoutes)
-app.use("/api/register/Users", registerUserRoutes)
-app.use("/api/login", loginRoutes)
-app.use("/api/logout", logoutRoute)
-app.use("/api/passRecov", passRecovRoutes)
+app.use('/api/models', modelsRoutes)
+app.use('/api/brand', brandRoutes)
+app.use('/api/sales', salesRoutes)
+app.use('/api/provider', providerRoutes)
+app.use('/api/orders', ordersRoutes)
+app.use('/api/vehicles', vehicleRoutes)
+app.use('/api/restoredvehicles', restoredVehicleRoutes)
+app.use('/api/register/moderator', registerModeratorRoutes)
+app.use('/api/register/Users', registerUserRoutes)
+app.use('/api/login', loginRoutes)
+app.use('/api/logout', logoutRoute)
+app.use('/api/passRecov', passRecovRoutes)
 
 export default app
