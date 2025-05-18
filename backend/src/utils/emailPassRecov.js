@@ -1,7 +1,6 @@
 import nodemailer from "nodemailer";
 import { config } from "../config.js";
 
-
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -11,11 +10,11 @@ const transporter = nodemailer.createTransport({
         pass: config.email.email_pass
     }
 });
+
 const sendMail = async (to, subject, text, html) => {
     try {
-      
         const info = await transporter.sendMail({
-            from: '"Cine Mundo" <info@cinemundo.com>',
+            from: '"Luxusfahrten" <info@luxusfahrten.com>',
             to,
             subject,
             text,
@@ -27,280 +26,118 @@ const sendMail = async (to, subject, text, html) => {
         throw error;
     }
 };
+
 const HTMLRecoveryEmail = (code) => {
     return `
     <!DOCTYPE html>
     <html lang="es">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Recuperación de Contraseña - Cine Mundo</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Recuperación de Contraseña</title>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-            
             body {
-                font-family: 'Poppins', Arial, sans-serif;
-                line-height: 1.6;
-                color: #333;
                 margin: 0;
                 padding: 0;
-                background-color: #f8f8f8;
+                font-family: 'Poppins', sans-serif;
+                background-color: #0e0e0e;
+                color: #e0e0e0;
             }
-            
+
             .container {
                 max-width: 600px;
-                margin: 20px auto;
-                background-color: #ffffff;
-                border-radius: 10px;
+                margin: 30px auto;
+                background-color: #1a1a1a;
+                border: 1px solid #333;
+                border-radius: 16px;
                 overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
             }
-            
+
             .header {
-                background: linear-gradient(135deg, #e53e3e 0%, #f56565 51%, #ed8936 100%);
-                color: white;
-                padding: 25px 20px;
+                background-color: #111;
+                padding: 40px 30px;
                 text-align: center;
+                color: #ffd700;
             }
-            
-            .logo {
-                margin-bottom: 15px;
-            }
-            
-            .logo img {
-                max-width: 150px;
-                height: auto;
-            }
-            
+
             .header h1 {
-                margin: 0;
                 font-size: 24px;
-                font-weight: 600;
-                letter-spacing: 0.5px;
+                margin: 0;
+                letter-spacing: 1px;
             }
-            
+
             .content {
                 padding: 30px;
-                background-color: #ffffff;
+                color: #ddd;
+                font-size: 15px;
+                line-height: 1.6;
             }
-            
-            .greeting {
-                font-size: 18px;
-                font-weight: 600;
-                margin-bottom: 20px;
-                color: #e53e3e;
-            }
-            
-            p {
-                margin: 0 0 15px;
-                color: #4a4a4a;
-            }
-            
-            .code-container {
-                background-color: #f1f7ff;
-                border-radius: 8px;
-                margin: 25px 0;
-                padding: 15px;
-                border-left: 4px solid #e53e3e;
-            }
-            
-            .code {
-                font-size: 32px;
-                font-weight: 700;
+
+            .code-box {
+                background-color: #222;
+                border: 2px solid #ffd700;
+                color: #ffd700;
+                font-size: 28px;
+                font-weight: bold;
+                letter-spacing: 6px;
                 text-align: center;
-                padding: 15px;
-                margin: 10px 0;
-                letter-spacing: 8px;
-                color: #e53e3e;
+                padding: 20px;
+                margin: 30px 0;
+                border-radius: 10px;
             }
-            
-            .code-info {
-                text-align: center;
-                font-size: 14px;
-                color: #777;
-            }
-            
-            .tip {
-                background-color: #fffde7;
-                border-radius: 8px;
-                padding: 15px;
-                margin: 20px 0;
-                border-left: 4px solid #f56565;
-            }
-            
-            .tip p {
-                margin: 0;
-                color: #5d4037;
-                font-size: 14px;
-            }
-            
-            .button-container {
-                text-align: center;
-                margin: 25px 0;
-            }
-            
+
             .button {
                 display: inline-block;
-                background: linear-gradient(135deg, #e53e3e 0%, #f56565 100%);
-                color: white;
+                background-color: #ffd700;
+                color: #111;
                 text-decoration: none;
-                padding: 12px 30px;
+                padding: 14px 28px;
+                font-weight: bold;
                 border-radius: 50px;
-                font-weight: 600;
-                font-size: 16px;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
-            }
-            
-            .button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 15px rgba(229, 62, 62, 0.4);
-            }
-            
-            .divider {
-                height: 1px;
-                background-color: #e0e0e0;
-                margin: 25px 0;
-            }
-            
-            .support {
-                background-color: #f9f9f9;
-                padding: 20px;
-                border-radius: 8px;
-                margin-top: 20px;
-            }
-            
-            .support h3 {
-                margin-top: 0;
-                font-size: 16px;
-                color: #e53e3e;
-            }
-            
-            .social-media {
-                text-align: center;
                 margin: 20px 0;
+                transition: background-color 0.3s ease;
             }
-            
-            .social-icon {
-                display: inline-block;
-                margin: 0 10px;
-                width: 36px;
-                height: 36px;
-                background-color: #e53e3e;
-                border-radius: 50%;
-                text-align: center;
-                line-height: 36px;
+
+            .button:hover {
+                background-color: #e6c200;
             }
-            
+
             .footer {
+                background-color: #111;
+                color: #888;
                 text-align: center;
                 font-size: 12px;
-                color: #777;
                 padding: 20px;
-                background-color: #f8f8f8;
-                border-top: 1px solid #e0e0e0;
+                border-top: 1px solid #333;
             }
-            
-            .address {
-                margin-top: 10px;
-                font-size: 11px;
-            }
-            
-            @media only screen and (max-width: 600px) {
-                .container {
-                    margin: 0;
-                    border-radius: 0;
-                }
-                
-                .header {
-                    padding: 15px;
-                }
-                
-                .content {
-                    padding: 20px;
-                }
-                
-                .code {
-                    font-size: 24px;
-                    letter-spacing: 5px;
-                }
+
+            .logo {
+                font-size: 18px;
+                font-weight: 700;
+                margin-bottom: 10px;
+                color: #ffd700;
             }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <div class="logo">
-                    <svg width="100" height="60" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100" height="60" rx="10" fill="#ffffff" fill-opacity="0.2"/>
-                        <path d="M25 20H75M25 30H75M25 40H75" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-                        <circle cx="35" cy="30" r="10" fill="#ffffff" fill-opacity="0.5"/>
-                        <text x="50" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#ffffff">Cine Mundo</text>
-                    </svg>
-                </div>
+                <div class="logo">Luxusfahrten</div>
                 <h1>Recuperación de Contraseña</h1>
             </div>
-            
             <div class="content">
-                <div class="greeting">¡Hola!</div>
-                
-                <p>Hemos recibido una solicitud para recuperar la contraseña de tu cuenta en Cine Mundo. Para garantizar la seguridad de tu cuenta, necesitamos verificar que eres tú.</p>
-                
-                <div class="code-container">
-                    <div class="code">${code}</div>
-                    <div class="code-info">Usa este código para restablecer tu contraseña</div>
-                </div>
-                
-                <p>Para completar el proceso de recuperación, ingresa el código anterior en la pantalla de recuperación de contraseña.</p>
-                
-                <div class="tip">
-                    <p><strong>💡 Importante:</strong> Este código es válido por 30 minutos. Si no has solicitado este cambio, puedes ignorar este correo o contactar a nuestro soporte técnico.</p>
-                </div>
-                
-                <div class="button-container">
-                    <a href="#" class="button">Ir a Cine Mundo</a>
-                </div>
-                
-                <div class="divider"></div>
-                
-                <p>Si tienes alguna pregunta o problema, no dudes en contactarnos. Estamos aquí para ayudarte.</p>
-                
-                <div class="support">
-                    <h3>Soporte Técnico</h3>
-                    <p>Teléfono: (503) 2222-3333</p>
-                    <p>Email: soporte@cinemundo.com</p>
-                    <p>Horario: Lunes a Domingo, 10:00 AM - 10:00 PM</p>
-                </div>
-                
-                <div class="social-media">
-                    <a href="#" class="social-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 2H15C13.6739 2 12.4021 2.52678 11.4645 3.46447C10.5268 4.40215 10 5.67392 10 7V10H7V14H10V22H14V14H17L18 10H14V7C14 6.73478 14.1054 6.48043 14.2929 6.29289C14.4804 6.10536 14.7348 6 15 6H18V2Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </a>
-                    
-                    <a href="#" class="social-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22 4C22 4 21.3 6.1 20 7.4C21.6 17.4 10.6 24.7 2 19C4.2 19.1 6.4 18.4 8 17C3 15.5 0.5 9.6 3 5C5.2 7.6 8.6 9.1 12 9C11.1 4.8 16 2.4 19 5.2C20.1 5.2 22 4 22 4Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </a>
-                    
-                    <a href="#" class="social-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M3 16V8C3 5.23858 5.23858 3 8 3H16C18.7614 3 21 5.23858 21 8V16C21 18.7614 18.7614 21 16 21H8C5.23858 21 3 18.7614 3 16Z" stroke="white" stroke-width="1.5"/>
-                            <path d="M17.5 6.51L17.51 6.49889" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </a>
-                </div>
+                <p>Hola,</p>
+                <p>Hemos recibido una solicitud para restablecer tu contraseña. Si fuiste tú, usa el siguiente código:</p>
+                <div class="code-box">${code}</div>
+                <p>Este código expirará en 30 minutos. Si no realizaste esta solicitud, puedes ignorar este mensaje.</p>
+                <p style="text-align:center;">
+                    <a href="#" class="button">Ir a Luxusfahrten</a>
+                </p>
             </div>
-            
             <div class="footer">
-                <p>&copy; ${new Date().getFullYear()} Cine Mundo. Todos los derechos reservados.</p>
-                <p>Este es un correo electrónico automático, por favor no responda a este mensaje.</p>
-                <div class="address">
-                    Cine Mundo S.A. de C.V. | Av. Principal #123, Col. Centro, San Salvador, El Salvador
-                </div>
+                &copy; ${new Date().getFullYear()} Luxusfahrten. Todos los derechos reservados.<br/>
+                Este correo fue enviado automáticamente, por favor no respondas a este mensaje.
             </div>
         </div>
     </body>

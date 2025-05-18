@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express"
 import cookieParser from 'cookie-parser'
 import modelsRoutes from "./src/routes/models.js"
 import brandRoutes from "./src/routes/brand.js"
@@ -9,11 +9,13 @@ import vehicleRoutes from "./src/routes/vehicles.js"
 import restoredVehicleRoutes from "./src/routes/restoreVehicles.js"
 import loginRoutes from "./src/routes/login.js"
 import registerModeratorRoutes from "./src/routes/register.js"
-import logoutRoute from "./src/routes/logout.js";
-import registerUserRoutes from "./src/routes/registerUser.js";
+import logoutRoute from "./src/routes/logout.js"
+import registerUserRoutes from "./src/routes/registerUser.js"
+import passRecovRoutes from "./src/routes/passRecov.js"
+import cors from "cors"
 
-const app = express();
-app.use(express.json());
+const app = express()
+app.use(express.json())
 app.use(cookieParser())
 
 
@@ -38,6 +40,8 @@ app.use("/api/register/Users", registerUserRoutes)
 app.use("/api/login", loginRoutes)
 
 app.use("/api/logout", logoutRoute)
+
+app.use("/api/passRecov", passRecovRoutes)
 
 
 
