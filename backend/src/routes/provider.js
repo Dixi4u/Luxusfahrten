@@ -13,4 +13,4 @@ router.route('/:id')
 .put(upload.single('image'), providerController.updateProvider)
 .delete(providerController.deleteProvider)
 
-export default router;
+export default router
