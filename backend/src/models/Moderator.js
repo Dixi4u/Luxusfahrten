@@ -5,12 +5,16 @@ const moderatorSchema = new Schema({
         type: String, 
         required: true 
     },
-    lastName: { 
+    actualDate: { 
         type: String, 
         required: true 
     },
     birthday: { 
-        type: Date, 
+        type: String, 
+        required: true 
+    },
+    address: { 
+        type: String, 
         required: true 
     },
     email: { 
@@ -26,13 +30,8 @@ const moderatorSchema = new Schema({
         type: String, 
         required: true 
     },
-    dui: { 
+    employeeType: { 
         type: String, 
-        required: true, 
-        unique: true 
-    },
-    isVerified: { 
-        type: Boolean, 
         default: true 
     },
     image: { 
