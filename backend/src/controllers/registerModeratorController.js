@@ -25,7 +25,7 @@ register.registerModerator = async (req, res) => {
             imgUrl = result.secure_url
         }
         const passwordHash = await bcryptjs.hash(password, 10)
-        const newModerator = new moderatorModel({ name, lastName, birthday, email, password: passwordHash, telephone, dui, isVerified: true, image: imgUrl })
+        const newModerator = new moderatorModel({ name, lastName, birthday, email, password: passwordHash, telephone, dui, isVerified, image: imgUrl })
         await newModerator.save()
 
         jwt.sign(

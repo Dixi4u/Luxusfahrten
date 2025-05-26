@@ -48,9 +48,9 @@ app.use('/api/vehicles', vehicleRoutes)
 
 app.use('/api/restoredvehicles', restoredVehicleRoutes)
 
-app.use('/api/register/moderator', registerModeratorRoutes)
+app.use('/api/registerModerator', registerModeratorRoutes)
 
-app.use('/api/register/Users', registerUserRoutes)
+app.use('/api/registerUsers', registerUserRoutes)
 
 app.use('/api/login', loginRoutes)
 
