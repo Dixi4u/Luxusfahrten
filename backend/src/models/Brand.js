@@ -2,12 +2,12 @@ import { Schema, model} from "mongoose"
 
 const brandSchema = new Schema({
     brandName: {
-        type : "string",
-        required : true
+        type: String, // Cambiar "string" por String (sin comillas)
+        required: true
     }
 }, {
-    timestamps : true,
-    strict : false
+    timestamps: true,
+    strict: false
 });
 
 export default model("brand", brandSchema);

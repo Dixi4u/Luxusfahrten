@@ -3,14 +3,13 @@ import {Schema, model} from "mongoose";
 const modelsSchema = new Schema({
     idBrand: {
         type: Schema.Types.ObjectId,
-        ref: "brand",
-        require: true
+        ref: "brand", // Asegúrate de que coincida con el nombre del modelo de Brand
+        required: true // Corregir "require" por "required"
     },
     nameModel: {
         type: String,
-        require: true
+        required: true // Corregir "require" por "required"
     }
-    
 }, {
     timestamps: true,
     strict: false
