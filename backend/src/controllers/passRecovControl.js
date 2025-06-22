@@ -147,7 +147,7 @@ passRecov.resetPassword = async (req, res) => {
             return res.status(404).json({ message: 'User not found' })
         }
 
-        res.clearCookie('recoveryToken')
+        res.clearCookie('tokenRecoveryCode')
 
         res.status(200).json({ message: 'Password reset successfully' })
 
