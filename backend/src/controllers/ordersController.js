@@ -6,14 +6,14 @@ ordersController.getOrders = async (req, res) => {
   try {
     console.log("🔍 Obteniendo pedidos desde la base de datos...");
     
-    // Populate las referencias a vehículos y clientes
     const orders = await ordersModel.find()
       .populate({
         path: 'idVehiculo',
         populate: [
           { path: 'idBrand', select: 'name' },
           { path: 'idModel', select: 'name' }
-        ]
+        ],
+        select: 'idBrand idModel year color price'
       })
       .populate({
         path: 'idCliente',
@@ -29,88 +29,75 @@ ordersController.getOrders = async (req, res) => {
   }
 };
 
-// INSERT - Crear nueva orden (mantiene funcionalidad original + nueva)
+// INSERT - Crear nueva orden
 ordersController.insertOrder = async (req, res) => {
   try {
-    console.log("📝 Datos recibidos:", req.body);
+    console.log("📝 Datos recibidos para crear pedido:", req.body);
     
     const {
-      // Campos originales
-      fullName,
-      documentId,
-      phone,
-      email,
-      address,
-      paymentMethod,
-      insuranceSelected,
-      termsAccepted,
-      // Campos nuevos para gestión de pedidos
-      idVehiculo,
       idCliente,
-      orderStatus,
-      orderDate,
-      totalPrice
+      idVehiculo,
+      metodoPago,
+      terminosYSeguro,
+      precioTotal,
+      status
     } = req.body;
 
-    // Si vienen los campos nuevos (gestión de pedidos)
-    if (idVehiculo && idCliente) {
-      // Validación para pedidos de gestión
-      if (!idVehiculo || !idCliente || !paymentMethod || !orderStatus || !orderDate || !totalPrice) {
-        return res.status(400).json({ 
-          message: "Campos obligatorios para pedido: idVehiculo, idCliente, paymentMethod, orderStatus, orderDate, totalPrice"
-        });
-      }
-
-      const newOrder = new ordersModel({
-        idVehiculo,
-        idCliente,
-        paymentMethod,
-        orderStatus,
-        orderDate,
-        totalPrice: parseFloat(totalPrice),
-        // Campos por defecto para mantener esquema
-        fullName: "Gestionado",
-        documentId: "00000000-0",
-        phone: "0000-0000",
-        email: "gestion@luxusfahrten.com",
-        address: "Gestión interna",
-        termsAccepted: true
+    // Validación de campos obligatorios
+    if (!idCliente || !idVehiculo || !metodoPago || !precioTotal) {
+      return res.status(400).json({ 
+        message: "Campos obligatorios: idCliente, idVehiculo, metodoPago, precioTotal"
       });
-
-      await newOrder.save();
-      console.log("✅ Pedido de gestión creado exitosamente");
-      return res.status(201).json({ message: "Pedido creado exitosamente", order: newOrder });
-    } 
-    
-    // Si vienen los campos originales (formulario web)
-    else {
-      // Validación original
-      if (
-        !fullName || !documentId || !phone ||
-        !email || !address || !paymentMethod ||
-        termsAccepted !== true
-      ) {
-        return res.status(400).json({ message: "Campos obligatorios incompletos o términos no aceptados." });
-      }
-
-      const newOrder = new ordersModel({
-        fullName,
-        documentId,
-        phone,
-        email,
-        address,
-        paymentMethod,
-        insuranceSelected: insuranceSelected || false,
-        termsAccepted
-      });
-
-      await newOrder.save();
-      console.log("✅ Orden web creada exitosamente");
-      return res.status(201).json({ message: "Orden guardada exitosamente." });
     }
+
+    // Validar que términos y seguro esté aceptado
+    if (terminosYSeguro !== true) {
+      return res.status(400).json({ 
+        message: "Debe aceptar los términos y condiciones" 
+      });
+    }
+
+    // Validar que el precio sea un número positivo
+    const numericPrice = parseFloat(precioTotal);
+    if (isNaN(numericPrice) || numericPrice <= 0) {
+      return res.status(400).json({ 
+        message: "El precio total debe ser un número válido mayor a 0" 
+      });
+    }
+
+    const newOrder = new ordersModel({
+      idCliente,
+      idVehiculo,
+      metodoPago,
+      terminosYSeguro,
+      precioTotal: numericPrice,
+      status: status || 'Pendiente'
+    });
+
+    await newOrder.save();
+    console.log("✅ Pedido creado exitosamente");
+    
+    // Retornar el pedido con populate para mostrar datos completos
+    const createdOrder = await ordersModel.findById(newOrder._id)
+      .populate({
+        path: 'idVehiculo',
+        populate: [
+          { path: 'idBrand', select: 'name' },
+          { path: 'idModel', select: 'name' }
+        ]
+      })
+      .populate({
+        path: 'idCliente',
+        select: 'name lastName email telephone'
+      });
+
+    res.status(201).json({ 
+      message: "Pedido creado exitosamente", 
+      order: createdOrder 
+    });
   } catch (error) {
-    console.error("❌ Error al guardar:", error);
-    res.status(500).json({ message: "Error al guardar la orden", error: error.message });
+    console.error("❌ Error al crear pedido:", error);
+    res.status(500).json({ message: "Error al crear el pedido", error: error.message });
   }
 };
 
@@ -121,76 +108,71 @@ ordersController.deleteOrder = async (req, res) => {
     
     const deleted = await ordersModel.findByIdAndDelete(req.params.id);
     if (!deleted) {
-      return res.status(404).json({ message: "Orden no encontrada." });
+      return res.status(404).json({ message: "Pedido no encontrado." });
     }
     
     console.log("✅ Pedido eliminado correctamente");
-    res.status(200).json({ message: "Orden eliminada correctamente." });
+    res.status(200).json({ message: "Pedido eliminado correctamente." });
   } catch (error) {
     console.error("❌ Error al eliminar:", error);
-    res.status(500).json({ message: "Error al eliminar la orden", error: error.message });
+    res.status(500).json({ message: "Error al eliminar el pedido", error: error.message });
   }
 };
 
-// UPDATE - Actualizar orden por ID (mantiene funcionalidad original + nueva)
+// UPDATE - Actualizar orden por ID
 ordersController.updateOrder = async (req, res) => {
   try {
     console.log("🔄 Actualizando pedido con ID:", req.params.id);
     console.log("Datos a actualizar:", req.body);
     
     const {
-      // Campos originales
-      fullName,
-      documentId,
-      phone,
-      email,
-      address,
-      paymentMethod,
-      insuranceSelected,
-      termsAccepted,
-      // Campos nuevos
-      idVehiculo,
       idCliente,
-      orderStatus,
-      orderDate,
-      totalPrice
+      idVehiculo,
+      metodoPago,
+      terminosYSeguro,
+      precioTotal,
+      status
     } = req.body;
 
     // Preparar datos de actualización
     const updateData = {};
-
-    // Si vienen campos de gestión
-    if (idVehiculo) updateData.idVehiculo = idVehiculo;
+    
     if (idCliente) updateData.idCliente = idCliente;
-    if (orderStatus) updateData.orderStatus = orderStatus;
-    if (orderDate) updateData.orderDate = orderDate;
-    if (totalPrice) updateData.totalPrice = parseFloat(totalPrice);
-
-    // Si vienen campos originales
-    if (fullName) updateData.fullName = fullName;
-    if (documentId) updateData.documentId = documentId;
-    if (phone) updateData.phone = phone;
-    if (email) updateData.email = email;
-    if (address) updateData.address = address;
-    if (paymentMethod) updateData.paymentMethod = paymentMethod;
-    if (insuranceSelected !== undefined) updateData.insuranceSelected = insuranceSelected;
-    if (termsAccepted !== undefined) updateData.termsAccepted = termsAccepted;
+    if (idVehiculo) updateData.idVehiculo = idVehiculo;
+    if (metodoPago) updateData.metodoPago = metodoPago;
+    if (terminosYSeguro !== undefined) updateData.terminosYSeguro = terminosYSeguro;
+    if (precioTotal) updateData.precioTotal = parseFloat(precioTotal);
+    if (status) updateData.status = status;
 
     const updated = await ordersModel.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true }
-    );
+    )
+    .populate({
+      path: 'idVehiculo',
+      populate: [
+        { path: 'idBrand', select: 'name' },
+        { path: 'idModel', select: 'name' }
+      ]
+    })
+    .populate({
+      path: 'idCliente',
+      select: 'name lastName email telephone'
+    });
 
     if (!updated) {
-      return res.status(404).json({ message: "Orden no encontrada." });
+      return res.status(404).json({ message: "Pedido no encontrado." });
     }
 
     console.log("✅ Pedido actualizado correctamente");
-    res.status(200).json({ message: "Orden actualizada correctamente.", updated });
+    res.status(200).json({ 
+      message: "Pedido actualizado correctamente.", 
+      order: updated 
+    });
   } catch (error) {
     console.error("❌ Error al actualizar:", error);
-    res.status(500).json({ message: "Error al actualizar la orden", error: error.message });
+    res.status(500).json({ message: "Error al actualizar el pedido", error: error.message });
   }
 };
 
