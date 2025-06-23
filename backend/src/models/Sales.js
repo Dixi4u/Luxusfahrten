@@ -1,42 +1,46 @@
 import { Schema, model } from "mongoose";
 
 const salesSchema = new Schema({
-    idBrand : {
-        type : Schema.Types.ObjectId,
-        ref : "brands",
-        required : true
+    name: {
+        type: String,
+        required: true
     },
-    idClient : {
-        type : Schema.Types.ObjectId,
-        ref : "clients",
-        required : true
+    document: {
+        type: String,
+        required: true
     },
-    idVehicle : {
-        type : Schema.Types.ObjectId,
-        ref : "vehicles",
-        required : true
+    phone: {
+        type: String,
+        required: true
     },
-    saleDate : {
-        type : Date,
-        default : Date.now
+    email: {
+        type: String,
+        required: true
     },
-    salePrice : {
-        type : Number,
-        required : true
+    address: {
+        type: String,
+        required: true
     },
-    saleStatus : {
-        type : String,
-        enum : ["pending", "approved", "rejected"],
-        default : "pending",
-        required : true
+    paymentMethod: {
+        type: String,
+        enum: ["transferencia", "efectivo", "tarjeta"], // puedes añadir más si usas otros métodos
+        required: true
     },
-    finalSalePrice : {
-        type : Number,
-        required : true
+    insurance: {
+        type: Boolean,
+        required: true
+    },
+    totalAmount: {
+        type: Number,
+        required: true
+    },
+    estimatedDeliveryDate: {
+        type: Date,
+        required: true
     }
-},{
-    timestamps : true,
-    strict : false
+}, {
+    timestamps: true,
+    strict: true
 });
 
 export default model("sales", salesSchema);
