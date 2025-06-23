@@ -1,36 +1,40 @@
 import { Schema, model } from "mongoose";
 
 const ordersSchema = new Schema({
-    idVehicle: {
-        type: Schema.Types.ObjectId,
-        ref: "vehicle",
-        require: true
-    },
-    idCliente: {
-        type: Schema.Types.ObjectId,
-        ref: "client",
-        require: true
-    },
-    paymentMethod: {
-        type: String,
-        require: true
-    },
-    orderStatus: {
-        type: String,
-        require: true
-    },
-    orderDate: {
-        type: Date,
-        require: true
-    },
-    totalPrice: {
-        type: Number,
-        require: true
-    }
-    
+  fullName: {
+    type: String,
+    required: true,
+  },
+  documentId: {
+    type: String,
+    required: true,
+  },
+  phone: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  paymentMethod: {
+    type: String,
+    required: true,
+  },
+  insuranceSelected: {
+    type: Boolean,
+    default: false,
+  },
+  termsAccepted: {
+    type: Boolean,
+    required: true,
+  }
 }, {
-    timestamps: true,
-    strict: false
-})
+  timestamps: true
+});
 
-export default model("orders", ordersSchema)
+export default model("orders", ordersSchema);
