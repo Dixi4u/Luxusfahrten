@@ -11,7 +11,7 @@ router.route('/').post(loginControl.login)
 router.route('/isLoggedIn').get(loginControl.isLoggedIn)
 
 // POST /api/login/logout - Cerrar sesión
-router.route('/logout').post(loginControl.logout)
+router.post('/', loginControl.logout)
 
 // Ruta protegida para verificar middleware (opcional)
 router.route('/protected').get(loginControl.verifyAuth, (req, res) => {
