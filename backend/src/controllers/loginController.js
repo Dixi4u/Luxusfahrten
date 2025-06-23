@@ -60,5 +60,18 @@ loginController.login = async (req, res) => {
     }
 }
 
+// Controlador para verificar si el usuario está logueado usando la cookie
+loginController.isLoggedIn = (req, res) => {
+    const token = req.cookies.authToken
+    if (!token) {
+        return res.status(401).json({ loggedIn: false, message: 'No token provided' })
+    }
+    jwt.verify(token, config.JWT.secret, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ loggedIn: false, message: 'Invalid or expired token' })
+        }
+        res.status(200).json({ loggedIn: true, user: decoded.user, userType: decoded.userType })
+    })
+}
 
 export default loginController
