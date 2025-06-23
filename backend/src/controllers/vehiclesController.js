@@ -2,6 +2,7 @@ const  vehiclesController = {};
 import vehiclesModel from "../models/Vehicles.js"
 import {v2 as cloudinary} from 'cloudinary'
 import {config} from '../config.js'
+import mongoose from "mongoose";
 
 cloudinary.config({
     cloud_name: config.cloudinary.cloudinary_name,
@@ -18,6 +19,9 @@ vehiclesController.getVehicle = async (req, res) => {
 //INSERT
 vehiclesController.insertVehicle = async (req, res) => {
     try {
+        if (typeof req.body.specs === 'string') {
+            req.body.specs = JSON.parse(req.body.specs);
+        }
         const { idBrand, idModel, year, price, type, color, description, specs, availability } = req.body;
         let imgUrl = ""
         if (req.file) {
@@ -45,6 +49,9 @@ vehiclesController.deleteVehicle = async (req, res) => {
 //UPDATE
 vehiclesController.updateVehicle = async (req, res) => {
    try {
+       if (typeof req.body.specs === 'string') {
+           req.body.specs = JSON.parse(req.body.specs);
+       }
        const { idBrand, idModel, year, price, type, color, description, specs, availability } = req.body;
        let imgUrl = ""
          if (req.file) {
@@ -61,6 +68,23 @@ vehiclesController.updateVehicle = async (req, res) => {
    } catch (error) {
        res.status(500).json({message: "Error updating vehicle"})
    }
+}
+
+//GET BY ID
+vehiclesController.getVehicleById = async (req, res) => {
+    try {
+        // Verifica si el id es válido de acuerdo a mongoose
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid vehicle ID" });
+        }
+        const vehicle = await vehiclesModel.findById(req.params.id);
+        if (!vehicle) {
+            return res.status(404).json({ message: "Vehicle not found" });
+        }
+        res.json(vehicle);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching vehicle" });
+    }
 }
 
 export default vehiclesController;

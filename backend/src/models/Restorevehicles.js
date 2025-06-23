@@ -1,4 +1,4 @@
-import {Schema, model} from "mongoose";
+import { Schema, model } from "mongoose";
 
 const restoredVehiclesSchema = new Schema({
     idBrand: {
@@ -32,7 +32,7 @@ const restoredVehiclesSchema = new Schema({
         require: true
     },
     specs: {
-        type: String,
+        type: Schema.Types.Mixed,
         require: true
     },
     availability: {
@@ -51,7 +51,7 @@ const restoredVehiclesSchema = new Schema({
         type: String,
         require: true
     }
-    
+
 }, {
     timestamps: true,
     strict: false

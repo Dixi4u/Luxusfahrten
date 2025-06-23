@@ -3,6 +3,7 @@ const  RestoredVehicleController = {};
 import {v2 as cloudinary} from 'cloudinary'
 import {config} from '../config.js'
 import RestoredVehicleModel from "../models/Restorevehicles.js"
+import mongoose from "mongoose";
 
 
 cloudinary.config({
@@ -20,18 +21,21 @@ RestoredVehicleController.getRestoredVehicle = async (req, res) => {
 //INSERT
 RestoredVehicleController.insertRestoredVehicle = async (req, res) => {
     try {
+        if (typeof req.body.specs === 'string') {
+            req.body.specs = JSON.parse(req.body.specs);
+        }
         const { idBrand, idModel, year, price, type, color, description, specs, availability, restorationSpecs, restorationCost} = req.body;
-    let imgUrl = ""
-    if (req.file) {
-        const result = await cloudinary.uploader.upload(req.file.path, {folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg']})
-        imgUrl = result.secure_url
-    }
+        let imgUrl = ""
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg']})
+            imgUrl = result.secure_url
+        }
 
-    const newRestoredVehicle = new RestoredVehicleModel({ idBrand, idModel, year, price, type, color, description, specs, availability, restorationSpecs, restorationCost, image: imgUrl })
+        const newRestoredVehicle = new RestoredVehicleModel({ idBrand, idModel, year, price, type, color, description, specs, availability, restorationSpecs, restorationCost, image: imgUrl })
 
-    await newRestoredVehicle.save()
+        await newRestoredVehicle.save()
 
-    res.json({message: "Saved successfully"})
+        res.json({message: "Saved successfully"})
 
     } catch (error) {
         res.status(500).json({message: "Error saving vehicle"})
@@ -52,22 +56,46 @@ RestoredVehicleController.deleteRestoredVehicle = async (req, res) => {
 //UPDATE
 RestoredVehicleController.updateRestoredVehicle = async (req, res) => {
     try {
-        const { idBrand, idModel, year, price, type, color, description, specs, availability, restorationSpecs, restorationCost } = req.body;
-        let imgUrl = ""
-    if (req.file) {
-        const result = await cloudinary.uploader.upload(req.file.path, {folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg']})
-        imgUrl = result.secure_url
-    }   
-    
-        const updateRestoredVehicle = await RestoredVehicleModel.findByIdAndUpdate(req.params.id,
-        {idBrand, idModel, year, price, type, color, description, specs, availability, restorationSpecs, restorationCost, image: imgUrl}, {new: true}
-    )
-    
-    res.json({message: "Updated successfully"})
-    res.status(200).json(updateRestoredVehicle)
+        if (typeof req.body.specs === 'string') {
+            req.body.specs = JSON.parse(req.body.specs);
+        }
+
+        // Solo actualiza los campos enviados en el body
+        const updateFields = { ...req.body };
+
+        // Si hay archivo, sube la imagen y actualiza el campo image
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg']});
+            updateFields.image = result.secure_url;
+        }
+
+        const updateRestoredVehicle = await RestoredVehicleModel.findByIdAndUpdate(
+            req.params.id,
+            updateFields,
+            { new: true }
+        );
+
+        res.json({ message: "Updated successfully", data: updateRestoredVehicle });
 
     } catch (error) {
-        res.status(500).json({message: "Error updating vehicle"})
+        res.status(500).json({ message: "Error updating vehicle" });
+    }
+}
+
+//GET BY ID
+RestoredVehicleController.getRestoredVehicleById = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid vehicle ID" });
+        }
+        const vehicle = await RestoredVehicleModel.findById(req.params.id);
+        if (!vehicle) {
+            return res.status(404).json({ message: "Restored vehicle not found" });
+        }
+        res.json(vehicle);
+    } catch (error) {
+        console.error(error); // <-- Esto te mostrará el error real en consola
+        res.status(500).json({ message: "Error fetching restored vehicle" });
     }
 }
 

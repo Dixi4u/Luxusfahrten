@@ -1,45 +1,37 @@
 import { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
-    name: { 
-        type: String, 
-        required: true 
+    email: {
+        type: String,
+        required: true,
+        unique: true
     },
-    lastName: { 
-        type: String, 
-        required: true 
+    password: {
+        type: String,
+        required: true
     },
-    birthday: { 
-        type: Date, 
-        required: true 
+    name: {
+        type: String,
+        required: true
     },
-    email: { 
-        type: String, 
-        required: true, 
-        unique: true 
+    telephone: {
+        type: String,
+        required: true
     },
-    password: { 
-        type: String, 
-        required: true 
+    birthday: {
+        type: Date,
+        required: true
     },
-    telephone: { 
-        type: String, 
-        required: true 
+    address: {
+        type: String,
+        required: true
     },
-    dui: { 
-        type: String, 
-        required: true, 
-        unique: true 
-    },
-    isVerified: { 
-        type: Boolean, 
-        default: true 
-    },
-    image: { 
-        type: String 
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
 });
 
-export default model("clients", userSchema);
+export default model("user", userSchema);

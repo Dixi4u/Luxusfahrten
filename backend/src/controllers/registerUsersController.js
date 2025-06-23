@@ -4,105 +4,54 @@ import userModel from '../models/User.js'
 import crypto from 'crypto'
 import providerModel from '../models/Provider.js'
 import { config } from '../config.js'
-import { v2 as cloudinary } from 'cloudinary'
 import sendVerificationEmail from '../utils/verificationCode.js'
-
-cloudinary.config({
-    cloud_name: config.cloudinary.cloudinary_name,
-    api_key: config.cloudinary.cloudinary_api_key,
-    api_secret: config.cloudinary.cloudinary_api_secret
-})
 
 const register = {}
 
 register.registerUser = async (req, res) => {
-    const { name, lastName, birthday, email, password, telephone, dui, isVerified } = req.body
-    let imgUrl = ""
+    const { email, password, name, telephone, birthday, address } = req.body
     try {
-        const existingUser = await userModel.findOne({ email })
+        // Verifica si ya existe el email en usuarios o proveedores
+        let existingUser = await userModel.findOne({ email })
+        if (!existingUser) {
+            existingUser = await providerModel.findOne({ email })
+        }
         if (existingUser) {
             return res.status(400).json({ message: 'Email already exists' })
         }
-        if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path, { folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg'] })
-            imgUrl = result.secure_url
-        }
+
         const passwordHash = await bcryptjs.hash(password, 10)
-        const newUser = new userModel({name,lastName,birthday,email,password: passwordHash,telephone,dui,isVerified,image: imgUrl})
+
+        // Solo crea usuario con los campos del formulario
+        const newUser = new userModel({
+            email,
+            password: passwordHash,
+            name,
+            telephone,
+            birthday,
+            address,
+            isVerified: false
+        })
+
         await newUser.save()
 
         const verificationCode = crypto.randomBytes(2).toString('hex')
-        console.log('Verification code:',  verificationCode)
+        console.log('Verification code:', verificationCode)
 
-        const token = jsonwebtoken.sign({email, verificationCode}, config.JWT.secret, { expiresIn: '2h' })
-        res.cookie('verificationCode', token, { httpOnly: true, maxAge: 2*60*60*1000 }) 
+        const token = jsonwebtoken.sign({ email, verificationCode }, config.JWT.secret, { expiresIn: '2h' })
+        res.cookie('verificationCode', token, { httpOnly: true, maxAge: 2 * 60 * 60 * 1000 })
 
         await sendVerificationEmail(email, verificationCode)
 
         return res.status(201).json({ message: 'User registered successfully', token })
 
-    }catch (error) {
-        console.log('Error'+ error)
+    } catch (error) {
+        console.log('Error' + error)
         res.status(500).json({ message: error.message })
     }
 }
 
-
-register.registerProvider = async (req, res) => {
-    const { 
-        name, lastName, birthday, email, password, telephone, dui, 
-        isVerified, addressProvider, typeSupplier } = req.body
-    let imgUrl = ""
-
-    try {
-        const existingProvider = await providerModel.findOne({ email })
-        if (existingProvider) {
-            return res.status(400).json({ message: 'Email already exists' })
-        }
-        if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path, { folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg'] })
-            imgUrl = result.secure_url
-        }
-
-        const passwordHash = await bcryptjs.hash(password, 10)
-
-        const newProvider = new providerModel({
-            name,
-            lastName,
-            birthday,
-            email,
-            password: passwordHash,
-            telephone,
-            dui,
-            isVerified,
-            addressProvider,
-            typeSupplier,
-            image: imgUrl
-        })
-
-        await newProvider.save()
-
-        const verificationCode = crypto.randomBytes(2).toString('hex')
-        console.log('Verification code:', verificationCode)
-
-        const token = jsonwebtoken.sign(
-            { email, verificationCode },
-            config.JWT.secret,
-            { expiresIn: '2h' }
-        )
-        res.cookie('verificationCode', token, { httpOnly: true, maxAge: 2 * 60 * 60 * 1000 }) 
-
-        await sendVerificationEmail(email, verificationCode)
-
-        return res.status(201).json({ message: 'Provider registered successfully', token })
-
-    } catch (error) {
-        return res.status(500).json({ message: 'Error registering provider', error })
-    }
-}
-
-
-register.verificationCode = async (req, res) => {   
+register.verificationCode = async (req, res) => {
     const { code } = req.body
     const token = req.cookies.verificationCode
 
@@ -122,7 +71,6 @@ register.verificationCode = async (req, res) => {
             return res.status(401).json({ message: "Invalid verification code" })
         }
 
-    
         let client = await userModel.findOne({ email })
         if (!client) {
             client = await providerModel.findOne({ email })
@@ -143,6 +91,5 @@ register.verificationCode = async (req, res) => {
         return res.status(500).json({ message: "Error verifying code", error: error.message })
     }
 }
-
 
 export default register
