@@ -19,9 +19,8 @@ vehiclesController.getVehicle = async (req, res) => {
 //INSERT
 vehiclesController.insertVehicle = async (req, res) => {
     try {
-        if (typeof req.body.specs === 'string') {
-            req.body.specs = JSON.parse(req.body.specs);
-        }
+        // Los campos de texto vienen en req.body
+        // El archivo viene en req.file
         const { idBrand, idModel, year, price, type, color, description, specs, availability } = req.body;
         let imgUrl = ""
         if (req.file) {
@@ -30,9 +29,9 @@ vehiclesController.insertVehicle = async (req, res) => {
         }
         const newVehicle = new vehiclesModel({ idBrand, idModel, year, price, type, color, description, specs, availability, image: imgUrl })
         await newVehicle.save()
-        res.json({message: "Saved successfully"})
+        res.status(201).json({ message: "Vehículo guardado correctamente" })
     } catch (error) {
-        res.status(500).json({message: "Error saving vehicle"})
+        res.status(500).json({ message: "Error saving vehicle", error: error.message })
     }
 }
 

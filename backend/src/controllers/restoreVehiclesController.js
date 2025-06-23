@@ -1,7 +1,7 @@
-const  RestoredVehicleController = {};
+const RestoredVehicleController = {};
 
-import {v2 as cloudinary} from 'cloudinary'
-import {config} from '../config.js'
+import { v2 as cloudinary } from 'cloudinary'
+import { config } from '../config.js'
 import RestoredVehicleModel from "../models/Restorevehicles.js"
 import mongoose from "mongoose";
 
@@ -14,42 +14,63 @@ cloudinary.config({
 
 //SELECT
 RestoredVehicleController.getRestoredVehicle = async (req, res) => {
-   const evaluation = await RestoredVehicleModel.find().populate('idBrand').populate('idModel')
-   res.json(evaluation)
+    const evaluation = await RestoredVehicleModel.find().populate('idBrand').populate('idModel')
+    res.json(evaluation)
 }
 
-//INSERT
+// INSERT - Mejorado con logs y manejo de errores
 RestoredVehicleController.insertRestoredVehicle = async (req, res) => {
     try {
-        if (typeof req.body.specs === 'string') {
-            req.body.specs = JSON.parse(req.body.specs);
-        }
-        const { idBrand, idModel, year, price, type, color, description, specs, availability, restorationSpecs, restorationCost} = req.body;
+        // Los campos de texto vienen en req.body
+        // El archivo viene en req.file
+        const { idBrand,
+            idModel,
+            year,
+            price,
+            type,
+            color,
+            description,
+            specs,
+            availability,
+            restorationSpecs,
+            restorationCost } = req.body;
         let imgUrl = ""
         if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path, {folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg']})
+            const result = await cloudinary.uploader.upload(req.file.path, { folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg'] })
             imgUrl = result.secure_url
         }
-
-        const newRestoredVehicle = new RestoredVehicleModel({ idBrand, idModel, year, price, type, color, description, specs, availability, restorationSpecs, restorationCost, image: imgUrl })
-
-        await newRestoredVehicle.save()
-
-        res.json({message: "Saved successfully"})
-
+        const newVehicle = new RestoredVehicleModel({
+            idBrand,
+            idModel,
+            year,
+            price,
+            type,
+            color,
+            description,
+            specs,
+            availability,
+            restorationSpecs,
+            restorationCost,
+            image: imgUrl
+        })
+        await newVehicle.save()
+        res.status(201).json({ message: "Vehículo guardado correctamente" })
     } catch (error) {
-        res.status(500).json({message: "Error saving vehicle"})
+        console.error("❌ Error insertando vehículo restaurado:", error)
+        res.status(500).json({ message: "Error saving restored vehicle", error: error.message })
     }
-}
+
+};
+
 
 //DELETE
 RestoredVehicleController.deleteRestoredVehicle = async (req, res) => {
     try {
-            await RestoredVehicleModel.findByIdAndDelete(req.params.id)
-            res.json({message: "Deleted successfully"})
+        await RestoredVehicleModel.findByIdAndDelete(req.params.id)
+        res.json({ message: "Deleted successfully" })
 
     } catch (error) {
-        res.status(500).json({message: "Error deleting vehicle"})
+        res.status(500).json({ message: "Error deleting vehicle" })
     }
 }
 
@@ -65,7 +86,7 @@ RestoredVehicleController.updateRestoredVehicle = async (req, res) => {
 
         // Si hay archivo, sube la imagen y actualiza el campo image
         if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path, {folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg']});
+            const result = await cloudinary.uploader.upload(req.file.path, { folder: 'public', allowed_formats: ['jpg', 'png', 'jpeg'] });
             updateFields.image = result.secure_url;
         }
 

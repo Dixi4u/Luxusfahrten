@@ -21,7 +21,7 @@ import passRecovRoutes from "./src/routes/passRecov.js"
 
 const app = express();
 
-app.use(express.json())
+app.use(express.json()); // <-- Esto está bien para JSON, pero no para FormData
 app.use(cookieParser())
 app.use(cors({
     origin: true,
